@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>File Launcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+<style>
+/* VOICE occasion: сайт приложения, уверенный и тихий, как у хорошей утилиты
+   IDEA сама программа: тёмное окно File Launcher с идущей передачей — сайт продолжает её интерфейс
+   PICTURE точный макет окна приложения: меню, ID, друг в списке, полоса передачи 81 ГБ в движении
+   COLOUR ночь #121318, карточки #1d1e27, барвинок #6c7cff ведёт, мятный #3ddc97 только для «готово»
+   TYPE Onest 800 заголовки + Onest текст, JetBrains Mono только для ID и скоростей
+   LAYOUT ноутбук: заголовок и кнопка над широким окном-макетом; телефон: заголовок, окно, кнопка */
+:root{color-scheme:dark;--bg:#121318;--card:#1d1e27;--field:#262733;--line:#2e3040;--ink:#ececf3;--mut:#9a9bb0;--acc:#6c7cff;--acc2:#8a96ff;--ok:#3ddc97;--warn:#ffcf5c}
+*{box-sizing:border-box;min-width:0}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Onest,system-ui,sans-serif;overflow-x:clip}
+a{color:var(--acc2)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 max(4vw,16px)}
+.band{padding:clamp(40px,6vw,88px) 0}
+nav{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:22px;height:64px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;color:var(--ink);text-decoration:none;margin-right:auto}
+.mark{width:30px;height:30px;border-radius:8px;background:var(--acc);display:grid;place-items:center}
+nav a.l{color:var(--mut);text-decoration:none;font-size:15px}
+nav a.l:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:10px;background:var(--acc);color:#fff;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:12px;min-height:48px;border:0;font:inherit;font-weight:700;cursor:pointer}
+.btn:hover{background:var(--acc2)}
+.btn:focus-visible,a:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+.btn.ghost{background:var(--field);color:var(--ink)}
+.btn.ghost:hover{background:var(--line)}
+nav .btn{padding:9px 16px;min-height:40px;font-size:15px}
+.hero{padding-top:clamp(36px,5vw,64px)}
+.hero-top{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:40px;align-items:end;margin-bottom:36px}
+h1{font-size:clamp(34px,5vw,52px);line-height:1.05;letter-spacing:-.02em;margin:0;text-wrap:balance;font-weight:800}
+.lead{font-size:18px;color:var(--mut);margin:0 0 20px;max-width:34em}
+.meta{color:var(--mut);font-size:14px;margin-top:12px}
+/* окно-макет */
+.win{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 30px 60px -30px #000}
+.bar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#e9b308;color:#1a1300;font-size:13px;font-weight:500}
+.bar i{width:14px;height:14px;border-radius:4px;background:var(--acc);display:inline-block}
+.bar span:last-child{margin-left:auto;letter-spacing:10px}
+.app{display:grid;grid-template-columns:200px minmax(0,1fr);min-height:420px}
+.side{background:#0e0f14;padding:18px 10px;display:flex;flex-direction:column;gap:2px}
+.side b{font-size:16px;padding:0 10px}.side small{color:var(--mut);padding:0 10px 14px;font-size:12px}
+.nav{padding:10px 12px;border-radius:8px;color:var(--mut);font-size:14px;display:flex;gap:10px;align-items:center}
+.nav.on{background:var(--card);color:var(--ink);font-weight:700}
+.nav svg{flex:none}
+.main{padding:22px 24px;display:flex;flex-direction:column;gap:14px}
+.main h3{margin:0;font-size:22px}
+.pane{background:var(--field);border-radius:12px;padding:16px}
+.id{font:600 clamp(22px,3vw,30px) "JetBrains Mono",monospace;letter-spacing:.02em}
+.pw{font:600 15px "JetBrains Mono",monospace;color:var(--acc2)}
+.dot{color:var(--ok);font-size:13px;margin-top:8px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;background:#30324a;border-radius:8px;font-size:15px}
+.row em{font-style:normal;color:var(--mut);font-size:13px;white-space:nowrap}
+.xfer{margin-top:auto;background:var(--card);border-top:1px solid var(--line);margin-inline:-24px;margin-bottom:-22px;padding:14px 24px}
+.st{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:14px}
+.st code{font:600 13px "JetBrains Mono",monospace;color:var(--mut);white-space:nowrap}
+.track{height:10px;background:var(--field);border-radius:6px;margin-top:10px;overflow:hidden}
+.fill{height:100%;width:64%;background:var(--acc);border-radius:6px;animation:go 9s linear infinite alternate}
+@keyframes go{from{width:38%}to{width:86%}}
+@media(prefers-reduced-motion:reduce){.fill{animation:none}html{scroll-behavior:auto}}
+.cancel{background:#ff5f6d;color:#fff;font-weight:700;border-radius:8px;padding:5px 12px;font-size:13px}
+/* секции */
+h2{font-size:clamp(28px,3.6vw,40px);line-height:1.08;letter-spacing:-.02em;margin:0 0 10px;text-wrap:balance}
+.sub{color:var(--mut);margin:0 0 32px;max-width:40em;font-size:17px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.f{background:var(--card);border-radius:14px;padding:22px;border:1px solid var(--line)}
+.f svg{display:block;margin-bottom:14px}
+.f h4{margin:0 0 6px;font-size:18px}
+.f p{margin:0;color:var(--mut);font-size:15px}
+.route{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) minmax(0,1fr);align-items:center;gap:0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px}
+.pc{text-align:center}.pc b{display:block;margin-top:8px}.pc span{color:var(--mut);font-size:14px}
+.pipe{position:relative;height:120px}
+.pipe svg{position:absolute;inset:0;width:100%;height:100%}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:16px}
+.step{background:var(--card);border-radius:14px;padding:20px;border:1px solid var(--line)}
+.step b{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--acc);margin-bottom:10px}
+.step p{margin:4px 0 0;color:var(--mut);font-size:15px}
+.modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.mode{border-radius:14px;padding:22px;background:var(--card);border:1px solid var(--line)}
+.mode h4{margin:0 0 4px;font-size:19px}
+.mode .tag{display:inline-block;font-size:13px;padding:3px 10px;border-radius:20px;background:var(--field);color:var(--mut);margin-bottom:10px}
+.mode.best{border-color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc)}
+.mode.best .tag{background:var(--acc);color:#fff}
+.mode ul{margin:10px 0 0;padding-left:18px;color:var(--mut);font-size:15px}
+.log{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.v{background:var(--card);border-radius:14px;padding:20px 22px;border:1px solid var(--line)}
+.v h4{margin:0 0 8px;font-size:17px;display:flex;gap:10px;align-items:baseline}
+.v h4 small{color:var(--mut);font-weight:400;font-size:13px}
+.v ul{margin:0;padding-left:18px;color:var(--mut);font-size:15px}
+.v.new{grid-column:1/-1;border-color:var(--acc)}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-bottom:10px}
+summary{cursor:pointer;font-weight:700;min-height:28px}
+details p{margin:10px 0 0;color:var(--mut)}
+.dl{background:var(--acc);color:#fff;border-radius:20px;padding:clamp(28px,4vw,48px);display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:32px;align-items:center}
+.dl h2{color:#fff}.dl p{margin:0 0 8px;color:#e6e8ff}
+.dl .btn{background:#fff;color:#2b37b8}
+.dl .btn:hover{background:#eef0ff}
+.dl ol{margin:0;padding-left:20px;color:#eef0ff;font-size:15px}
+.dl ol li{margin-bottom:6px}
+.soon{display:block;font-size:13px;color:#dfe2ff;margin-top:10px}
+footer{border-top:1px solid var(--line);padding:28px 0;color:var(--mut);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+@media(max-width:900px){.hero-top{grid-template-columns:1fr;gap:18px}.grid,.modes,.steps{grid-template-columns:repeat(2,minmax(0,1fr))}.dl{grid-template-columns:1fr}}
+@media(max-width:700px){.app{grid-template-columns:1fr}.side{flex-direction:row;overflow-x:auto;padding:10px}.side b,.side small{display:none}.nav{white-space:nowrap}.log{grid-template-columns:1fr}.route{grid-template-columns:1fr;gap:6px}.pipe{height:80px}nav a.l{display:none}}
+@media(max-width:560px){.grid,.modes,.steps{grid-template-columns:1fr}.main{padding:16px}.xfer{margin-inline:-16px;margin-bottom:-16px;padding:12px 16px}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="arrows" viewBox="0 0 24 24"><path d="M4 8h13l-3-3M20 16H7l3 3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="globe" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></g></symbol>
+    <symbol id="home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="link" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 0 0-5.6-5.6l-1 1"/><path d="M14 10a4 4 0 0 0-5.6 0l-3 3a4 4 0 0 0 5.6 5.6l1-1"/></g></symbol>
+    <symbol id="list" viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+    <symbol id="gear" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></g></symbol>
+    <symbol id="resume" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v5h-5"/></g></symbol>
+    <symbol id="bolt" viewBox="0 0 24 24"><path d="M13 2L5 14h6l-1 8 8-12h-6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></g></symbol>
+    <symbol id="pc" viewBox="0 0 64 52"><rect x="4" y="2" width="56" height="36" rx="5" fill="#262733" stroke="#6c7cff" stroke-width="2"/><rect x="10" y="8" width="44" height="24" rx="2" fill="#121318"/><rect x="14" y="13" width="18" height="3" rx="1.5" fill="#6c7cff"/><rect x="14" y="19" width="30" height="3" rx="1.5" fill="#3a3c52"/><rect x="14" y="25" width="24" height="3" rx="1.5" fill="#3a3c52"/><path d="M26 38h12l3 10H23z" fill="#2e3040"/><rect x="18" y="47" width="28" height="3" rx="1.5" fill="#2e3040"/></symbol>
+  </defs>
+</svg>
+
+<nav>
+  <div class="wrap">
+    <a class="logo" href="#top"><span class="mark"><svg width="18" height="18" color="#fff"><use href="#arrows"/></svg></span>File Launcher</a>
+    <a class="l" href="#features">Возможности</a>
+    <a class="l" href="#how">Как это работает</a>
+    <a class="l" href="#faq">Вопросы</a>
+    <a class="l" href="#updates">Обновления</a>
+    <a class="btn" href="#download">Скачать</a>
+  </div>
+</nav>
+
+<header class="band hero" id="top">
+  <div class="wrap">
+    <div class="hero-top">
+      <h1>Перекидывай файлы любого размера — хоть 100 ГБ за раз</h1>
+      <div>
+        <p class="lead">Отправка другу по ID и паролю, напрямую через Radmin VPN или по ссылке. С докачкой после обрывов, проверкой каждого куска, в несколько потоков и со сжатием на лету.</p>
+        <a class="btn" href="#download"><svg width="20" height="20"><use href="#arrows"/></svg>Скачать для Windows</a>
+        <div class="meta">Бесплатно · Windows 10 и 11 · версия 3.7.1 · без регистрации</div>
+      </div>
+    </div>
+
+    <div class="win" role="img" aria-label="Окно программы File Launcher во время отправки большого архива">
+      <div class="bar"><i></i>File Launcher<span>– ▢ ✕</span></div>
+      <div class="app">
+        <div class="side">
+          <b>⇄ File Launcher</b><small>МОЙ-ПК · v3.7.1</small>
+          <div class="nav on"><svg width="18" height="18"><use href="#globe"/></svg>Интернет</div>
+          <div class="nav"><svg width="18" height="18"><use href="#home"/></svg>Напрямую по IP</div>
+          <div class="nav"><svg width="18" height="18"><use href="#link"/></svg>Ссылки</div>
+          <div class="nav"><svg width="18" height="18"><use href="#list"/></svg>Журнал</div>
+          <div class="nav"><svg width="18" height="18"><use href="#gear"/></svg>Настройки</div>
+        </div>
+        <div class="main">
+          <h3>Через интернет</h3>
+          <div class="pane">
+            <div class="id">415 937 206</div>
+            <div class="pw">пароль: пример-пароля</div>
+            <div class="dot">● В сети — можно принимать файлы</div>
+            <div style="color:var(--mut);font-size:12px;margin-top:4px">ID, пароль и адреса на этой странице — для примера</div>
+          </div>
+          <div class="row"><span>🖥  Друг</span><em>ID 123 456 789</em></div>
+          <div class="xfer">
+            <div class="st"><span>Отправка · потоков: 4 · сжатие</span><span class="cancel">✕ Отмена</span></div>
+            <div class="st" style="margin-top:4px"><code>18.4 МБ/с · осталось ~1 ч 12 мин</code><code>52.1 ГБ из 81.3 ГБ</code></div>
+            <div class="track"><div class="fill"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="band" id="features">
+  <div class="wrap">
+    <h2>Всё, что нужно для больших файлов</h2>
+    <p class="sub">Без облаков и лимитов: файлы идут прямо с твоего компьютера на компьютер друга. Девять вещей, которые для этого нужны.</p>
+    <div class="grid" id="feat"></div>
+  </div>
+</section>
+
+<section class="band" id="how" style="background:#17181f">
+  <div class="wrap">
+    <h2>Три способа отправить</h2>
+    <p class="sub">Выбирай под ситуацию — программа подскажет, какой подходит.</p>
+    <div class="modes">
+      <div class="mode">
+        <span class="tag">Друг где угодно</span>
+        <h4>Через интернет по ID</h4>
+        <p style="margin:0;color:var(--mut);font-size:15px">Как в программах удалённого доступа: у каждого ПК свой ID и пароль.</p>
+        <ul><li>Без проброса портов</li><li>Всё шифруется паролем</li><li>Три сервера-посредника на выбор</li></ul>
+      </div>
+      <div class="mode best">
+        <span class="tag">Самый быстрый</span>
+        <h4>Напрямую по IP</h4>
+        <p style="margin:0;color:var(--mut);font-size:15px">Дома — по Wi‑Fi, издалека — через Radmin VPN или ZeroTier.</p>
+        <ul><li>До 12 потоков одновременно</li><li>Докачка с места обрыва</li><li>Работает, когда друг в России</li></ul>
+      </div>
+      <div class="mode">
+        <span class="tag">Как файлообменник</span>
+        <h4>По ссылке</h4>
+        <p style="margin:0;color:var(--mut);font-size:15px">Выложи файл — получи ссылку. Друг скачивает в браузере.</p>
+        <ul><li>Программа другу не нужна</li><li>Поддержка менеджеров загрузок</li><li>Счётчик скачиваний</li></ul>
+      </div>
+    </div>
+
+    <h2 style="margin-top:56px;font-size:clamp(24px,3vw,32px)">Как отправить другу в другой город</h2>
+    <div class="route" aria-label="Схема: твой ПК, туннель Radmin VPN, ПК друга">
+      <div class="pc"><svg width="96" height="78"><use href="#pc"/></svg><b>Твой ПК</b><span>26.10.0.1</span></div>
+      <div class="pipe"><svg id="pipe"></svg></div>
+      <div class="pc"><svg width="96" height="78"><use href="#pc"/></svg><b>ПК друга</b><span>26.10.0.2</span></div>
+    </div>
+    <div class="steps">
+      <div class="step"><b>1</b><div><strong>Поставьте Radmin VPN</strong></div><p>Оба, бесплатно. Один создаёт сеть, второй в неё заходит.</p></div>
+      <div class="step"><b>2</b><div><strong>Добавь IP друга</strong></div><p>Во вкладке «Напрямую по IP» впиши его адрес 26.x.x.x — он сохранится.</p></div>
+      <div class="step"><b>3</b><div><strong>Перетащи файлы</strong></div><p>Прямо в окно. Друг нажимает «Принять» — и поехали.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="faq">
+  <div class="wrap">
+    <h2>Частые вопросы</h2>
+    <p class="sub">Если ответа нет — в программе есть раздел «Справка» с обучением.</p>
+    <div id="faqs"></div>
+  </div>
+</section>
+
+<section class="band" id="updates" style="background:#17181f">
+  <div class="wrap">
+    <h2>История обновлений</h2>
+    <p class="sub">Программа сама показывает, что нового, после каждого обновления.</p>
+    <div class="log" id="log"></div>
+  </div>
+</section>
+
+<section class="band" id="download">
+  <div class="wrap">
+    <div class="dl">
+      <div>
+        <h2>Скачать File Launcher</h2>
+        <p>Один файл FileLauncher.exe — установка не нужна. Версия 3.7.1 для Windows 10 и 11.</p>
+        <a class="btn" id="dlbtn" href="#download"><svg width="20" height="20"><use href="#arrows"/></svg>Скачать FileLauncher.exe</a>
+        <span class="soon" id="soon">Файл публикуется — ссылка на скачивание скоро появится здесь.</span>
+      </div>
+      <ol>
+        <li>Скачай и запусти FileLauncher.exe — отдельная установка не нужна.</li>
+        <li>Если Windows покажет «Windows защитил ваш компьютер» — нажми «Подробнее» → «Выполнить в любом случае»: у программы пока нет цифровой подписи.</li>
+        <li>Брандмауэр спросит про доступ к сети — разреши для частных и общественных сетей.</li>
+        <li>Пройди обучение на минуту — и отправляй.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>File Launcher — бесплатная программа для передачи файлов</span>
+    <span>Данные при передаче через интернет шифруются · файлы не хранятся на чужих серверах</span>
+  </div>
+</footer>
+
+<script>
+{
+  const DOWNLOAD_URL = "";   // ссылка на FileLauncher.exe (например, GitHub Releases)
+  const feats = [
+    ["globe", "По ID и паролю", "Друг добавляет твой ID один раз — дальше шлёте файлы друг другу из любой точки."],
+    ["home", "Напрямую по IP", "Локальная сеть, Radmin VPN, ZeroTier. Максимальная скорость, без посредников."],
+    ["link", "Ссылки с паролем и QR", "Выложил файл — получил ссылку. Можно поставить пароль, срок жизни и показать QR-код для телефона."],
+    ["resume", "Докачка", "Оборвалась связь на 60-м гигабайте? Отправь снова — продолжится с того же места."],
+    ["bolt", "Потоки и сжатие", "До 12 соединений сразу и сжатие на лету. Уже сжатые rar и видео пропускаются."],
+    ["moon", "Можно на ночь", "ПК не уснёт во время передачи и может сам выключиться, когда всё дойдёт."],
+    ["lock", "Проверка целостности", "Каждый кусок сверяется контрольной суммой. Повреждённый в пути кусок придёт заново сам."],
+    ["resume", "Синхронизация папок", "Отправляются только новые и изменённые файлы — удобно для модов и сохранений игр."],
+    ["list", "Очередь и история", "Закидывай файлы, пока идёт отправка. Любую прошлую передачу можно повторить одной кнопкой."],
+  ];
+  const ic = (id, c) => `<svg width="30" height="30" style="color:${c}"><use href="#${id}"/></svg>`;
+  document.getElementById("feat").innerHTML = feats.map(([i, t, d], k) =>
+    `<div class="f">${ic(i, k === 3 ? "var(--ok)" : "var(--acc2)")}<h4>${t}</h4><p>${d}</p></div>`).join("");
+
+  const faqs = [
+    ["Есть ли ограничение на размер файлов?", "Нет. Ограничивает только свободное место на диске получателя — программа проверит его заранее и честно скажет, если места не хватит."],
+    ["Друг в России — будет работать?", "Через вкладку «Интернет» — скорее всего, нет: российские провайдеры обрывают соединения с зарубежными серверами. Используйте Radmin VPN и «Напрямую по IP» — так файлы идут без зарубежных серверов."],
+    ["Это безопасно?", "При передаче через интернет всё шифруется ключом из пароля получателя — сервер-посредник видит только мусор. Напрямую файлы идут по вашей сети или VPN-туннелю. Ссылки на скачивание длинные и случайные."],
+    ["Почему медленно через Radmin VPN?", "Проверь, что соединение прямое, а не через ретранслятор Radmin; включи UPnP на роутере. В настройках File Launcher увеличь число потоков до 8–12."],
+    ["Сжимается ли RAR?", "Нет — архив уже сжат, и никакая программа не сделает его заметно меньше. Сжатие помогает на распакованных папках, документах и конфигах."],
+    ["Как обновлять программу?", "Если автор выложил релиз на GitHub, программа сама предложит обновиться при запуске. Проверить вручную можно в разделе «Справка»."],
+    ["Как убедиться, что большой файл дошёл без ошибок?", "Ничего делать не нужно: каждый кусок проверяется контрольной суммой, а в журнале появится «Проверено: все куски совпали»."],
+    ["Что будет, если закрыть программу во время передачи?", "Уже полученная часть сохранится. Отправь те же файлы снова — передача продолжится с того же места."],
+  ];
+  const esc = s => s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  document.getElementById("faqs").innerHTML = faqs.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("");
+
+  const log = [
+    ["3.7", "новое", ["Проверка целостности каждого куска", "Синхронизация папок", "Очередь передач и история с «Отправить снова»", "Ссылки с паролем, сроком жизни и QR-кодом", "Автообновление через GitHub", "3.7.1: исправлено пропадание окна при сворачивании"]],
+    ["3.6", "", ["Обучение и история обновлений в программе", "ПК не засыпает во время передачи", "Выключение компьютера после передачи", "Ограничение скорости отправки", "Проверка связи с другом", "Автозапуск с Windows", "Уведомления о завершении"]],
+    ["3.5", "", ["Ссылки на скачивание с поддержкой докачки"]],
+    ["3.3", "", ["Сжатие на лету с автоматическим восстановлением"]],
+    ["3.2", "", ["Передача в несколько потоков", "Докачка после обрыва"]],
+    ["3.1", "", ["Вкладка «Напрямую по IP» для Radmin VPN и ZeroTier"]],
+    ["3.0", "", ["Перетаскивание файлов в окно", "Сообщения между ПК", "Запасные серверы"]],
+    ["2.0", "", ["Новый дизайн, отмена передачи, настройки, музыка"]],
+    ["1.0", "", ["Первая версия: локальная сеть и интернет по ID"]],
+  ];
+  document.getElementById("log").innerHTML = log.map(([v, tag, items], k) =>
+    `<div class="v${k === 0 ? " new" : ""}"><h4>Версия ${v}${tag ? ` <small>${tag}</small>` : ""}</h4><ul>${items.map(i => `<li>${esc(i)}</li>`).join("")}</ul></div>`).join("");
+
+  if (DOWNLOAD_URL) {
+    const b = document.getElementById("dlbtn");
+    b.href = DOWNLOAD_URL;
+    document.getElementById("soon").remove();
+  }
+
+  const pipe = document.getElementById("pipe");
+  const draw = () => {
+    const W = pipe.clientWidth, H = pipe.clientHeight, y = H / 2;
+    const dots = Array.from({length: 7}, (_, i) =>
+      `<rect x="${12 + i * (W - 40) / 6}" y="${y - 7}" width="16" height="14" rx="3" fill="#6c7cff" opacity="${0.35 + i * 0.1}"/>`).join("");
+    pipe.innerHTML = `<rect x="4" y="${y - 16}" width="${W - 8}" height="32" rx="16" fill="#262733" stroke="#2e3040"/>${dots}
+      <text x="${W / 2}" y="${y - 26}" text-anchor="middle" fill="#9a9bb0" font-size="14" font-family="Onest,sans-serif">туннель Radmin VPN · 4 потока</text>`;
+  };
+  const ro = new ResizeObserver(draw);
+  ro.observe(pipe);
+}
+</script>
+</body>
+</html>
