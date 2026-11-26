@@ -122,6 +122,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <symbol id="resume" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v5h-5"/></g></symbol>
     <symbol id="bolt" viewBox="0 0 24 24"><path d="M13 2L5 14h6l-1 8 8-12h-6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
     <symbol id="moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></g></symbol>
+    <symbol id="crown" viewBox="0 0 24 24"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
     <symbol id="lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></g></symbol>
     <symbol id="pc" viewBox="0 0 64 52"><rect x="4" y="2" width="56" height="36" rx="5" fill="#262733" stroke="#6c7cff" stroke-width="2"/><rect x="10" y="8" width="44" height="24" rx="2" fill="#121318"/><rect x="14" y="13" width="18" height="3" rx="1.5" fill="#6c7cff"/><rect x="14" y="19" width="30" height="3" rx="1.5" fill="#3a3c52"/><rect x="14" y="25" width="24" height="3" rx="1.5" fill="#3a3c52"/><path d="M26 38h12l3 10H23z" fill="#2e3040"/><rect x="18" y="47" width="28" height="3" rx="1.5" fill="#2e3040"/></symbol>
   </defs>
@@ -183,7 +186,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <section class="band" id="features">
   <div class="wrap">
     <h2>Всё, что нужно для больших файлов</h2>
-    <p class="sub">Без облаков и лимитов: файлы идут прямо с твоего компьютера на компьютер друга. Девять вещей, которые для этого нужны.</p>
+    <p class="sub">Без облаков и лимитов: файлы идут прямо с твоего компьютера на компьютер друга. Всё, что для этого нужно, — в одной программе.</p>
     <div class="grid" id="feat"></div>
   </div>
 </section>
@@ -264,7 +267,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
 <footer>
   <div class="wrap">
-    <span>File Launcher — бесплатная программа для передачи файлов</span>
+    <span>File Launcher — бесплатная программа для передачи файлов · создатель 👑 <a href="https://github.com/yukishkn/file-launcher">yukishkn</a></span>
     <span>Данные при передаче через интернет шифруются · файлы не хранятся на чужих серверах</span>
   </div>
 </footer>
@@ -282,6 +285,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     ["lock", "Проверка целостности", "Каждый кусок сверяется контрольной суммой. Повреждённый в пути кусок придёт заново сам."],
     ["resume", "Синхронизация папок", "Отправляются только новые и изменённые файлы — удобно для модов и сохранений игр."],
     ["list", "Очередь и история", "Закидывай файлы, пока идёт отправка. Любую прошлую передачу можно повторить одной кнопкой."],
+    ["user", "Профили и аватарки", "Новое в 3.8: ник и аватарка, один профиль на компьютер. Друзья видят, кто им пишет и шлёт файлы."],
+    ["crown", "Значок создателя", "Новое в 3.8: создатель программы отмечен 👑. Значок подтверждается цифровой подписью — подделать нельзя."],
+    ["shield", "Окно входящих", "Новое в 3.8: аватарка отправителя, список файлов и кнопка «Заблокировать» от спама."],
   ];
   const ic = (id, c) => `<svg width="30" height="30" style="color:${c}"><use href="#${id}"/></svg>`;
   document.getElementById("feat").innerHTML = feats.map(([i, t, d], k) =>
@@ -301,7 +307,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   document.getElementById("faqs").innerHTML = faqs.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("");
 
   const log = [
-    ["3.7", "новое", ["Проверка целостности каждого куска", "Синхронизация папок", "Очередь передач и история с «Отправить снова»", "Ссылки с паролем, сроком жизни и QR-кодом", "Автообновление через GitHub", "3.7.1: исправлено пропадание окна при сворачивании"]],
+    ["3.8", "скоро", ["Профили: ник и аватарка, один профиль на компьютер", "Друзья видят твой ник и аватарку в списках, сообщениях и окне входящих", "Значок 👑 «Создатель» с проверкой цифровой подписи", "Новое окно входящих файлов с кнопкой «Заблокировать»"]],
+    ["3.7", "", ["Проверка целостности каждого куска", "Синхронизация папок", "Очередь передач и история с «Отправить снова»", "Ссылки с паролем, сроком жизни и QR-кодом", "Автообновление через GitHub", "3.7.1: исправлено пропадание окна при сворачивании"]],
     ["3.6", "", ["Обучение и история обновлений в программе", "ПК не засыпает во время передачи", "Выключение компьютера после передачи", "Ограничение скорости отправки", "Проверка связи с другом", "Автозапуск с Windows", "Уведомления о завершении"]],
     ["3.5", "", ["Ссылки на скачивание с поддержкой докачки"]],
     ["3.3", "", ["Сжатие на лету с автоматическим восстановлением"]],
